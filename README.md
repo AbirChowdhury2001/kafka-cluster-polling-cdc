@@ -1,5 +1,3 @@
-# MySQL -> Kafka -> MySQL pipeline
-
 # Kafka Cluster with Polling-Based Change Capture
 
 A small data pipeline built to learn Kafka and Kubernetes hands-on. One script reads new or changed rows from a MySQL table, publishes them to Kafka, and a second script consumes those events and writes them into a separate MySQL table.
