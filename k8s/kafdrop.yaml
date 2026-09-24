@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafdrop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafdrop
+  template:
+    metadata:
+      labels:
+        app: kafdrop
+    spec:
+      tolerations:
+        - key: node-role.kubernetes.io/control-plane
+          operator: Exists
+          effect: NoSchedule
+      containers:
+        - name: kafdrop
+          image: obsidiandynamics/kafdrop:latest
+          ports:
+            - containerPort: 9000
+          env:
+            - name: KAFKA_BROKERCONNECT
+              value: "kafka-cluster-kafka-bootstrap:9092"
+            - name: KAFKA_PROPERTIES_FILE
+              value: "/opt/kafdrop/kafka.properties"
+            - name: JVM_OPTS
+              value: "-Xms64M -Xmx256M"
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: "100m"
+            limits:
+              memory: 512Mi
+              cpu: "500m"
+          volumeMounts:
+            - name: kafdrop-config
+              mountPath: /opt/kafdrop
+      volumes:
+        - name: kafdrop-config
+          secret:
+            secretName: kafdrop-client-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafdrop
+spec:
+  type: NodePort
+  selector:
+    app: kafdrop
+  ports:
+    - port: 9000
+      targetPort: 9000
+      nodePort: 30900
