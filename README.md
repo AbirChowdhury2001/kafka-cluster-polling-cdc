@@ -1,10 +1,12 @@
 # MySQL -> Kafka -> MySQL pipeline
 
-This is a project I built to learn Kafka and Kubernetes. It's a small pipeline: a script reads new/changed rows from one MySQL table, sends them to Kafka, and another script reads them from Kafka and writes them into a second MySQL table.
+# Kafka Cluster with Polling-Based Change Capture
 
-The Kafka cluster runs on a 3-node Kubernetes cluster I set up myself on 3 Ubuntu VMs, using the Strimzi operator (KRaft mode, so no Zookeeper).
+A small data pipeline built to learn Kafka and Kubernetes hands-on. One script reads new or changed rows from a MySQL table, publishes them to Kafka, and a second script consumes those events and writes them into a separate MySQL table.
 
-I didn't use Debezium or Kafka Connect for the CDC part. I just wrote a Python script that checks the `updated_at` column every few seconds and picks up anything new. It's not real CDC (real CDC reads the database binlog and doesn't miss anything), but I wanted to build the basic version myself first so I actually understand what's happening instead of just plugging in a connector.
+The Kafka cluster runs on a 3-node Kubernetes cluster (3 Ubuntu VMs) using the Strimzi operator in KRaft mode (no Zookeeper).
+
+Change detection is polling-based rather than true CDC, a Python script checks the `updated_at` column every few seconds and picks up anything new, instead of using Debezium or Kafka Connect. This isn't log-based CDC (which reads the database binlog and guarantees nothing is missed), but building the polling version first made the underlying mechanics clear before relying on a pre-built connector.
 
 ## What's in here
 
